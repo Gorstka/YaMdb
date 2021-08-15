@@ -1,10 +1,12 @@
 from rest_framework import permissions
 
-class IsAdminOnly(permissions.BasePermission):
+
+class AdminOnly(permissions.BasePermission):
     
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        if request.user == request.user.is_staff:
-            return True
+    def has_permission(self, request, view):
+        if (request.user.is_authenticated):
+            return (request.user.role == "admin" or
+            request.user.is_staff == True or
+            request.user.is_superuser == True
+            )
         return False

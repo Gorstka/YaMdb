@@ -7,17 +7,18 @@ CHOICES = (
     ("user", "user")
 )
 
+
 class User(AbstractUser):
 
     role = models.CharField(
         "Роль",
         max_length=10,
         choices=CHOICES,
+        blank=False,
+        default="user",
+        null=False,
     )
     bio = models.TextField(
         "Биография",
         blank=True,
     )
-
-    def __str__(self):
-        return self.bio
