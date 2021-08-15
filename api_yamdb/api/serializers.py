@@ -1,14 +1,14 @@
 from djoser.serializers import UserSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator, ValidationError
 
 
 from users.models import User
 
-class CustomUserSerializer(UserSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     
     class Meta:
-        fields = ("id", "username", "email", "role", "bio", "first_name", "last_name")
+        fields = ("username", "email", "role", "bio", "first_name", "last_name")
         model = User
 
 
@@ -22,5 +22,18 @@ class TokenSerializer(serializers.ModelSerializer):
 class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ["email", "username"]
+        fields = ("email", "username")
         model = User
+        extra_kwargs = {"email": {"required": True}}
+        validators = [
+            UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=("email",),
+                message="Почта уже существует",
+            )
+        ]
+
+    def validate_username(self, value):
+        if value == "me":
+            raise ValidationError("Нельзя регистрировать имя пользователя 'me'")
+        return value

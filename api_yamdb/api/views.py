@@ -30,6 +30,11 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def get_permissions(self):
+        if self.action == "partial_update" or self.action == "destroy":
+            return (IsAdminUser(),)
+        return super().get_permissions()
+
 
 class Signup(CreateAPIView):
 
@@ -41,9 +46,10 @@ class Signup(CreateAPIView):
             user = User.objects.get(username=request.data["username"], email=request.data["email"])
             confirmation_code = default_token_generator.make_token(user)
             send_mail(
+                "Hello",
                 f"Confirmation Code - {confirmation_code}",
                 "admin@yamdb.com",
-                serializer.data["email"],
+                [serializer.data["email"]],
                 fail_silently=True,
             )
             return Response(serializer.data, status=status.HTTP_200_OK)
