@@ -1,4 +1,40 @@
 from django.db import models
+from users.models import User
+
+
+class Categorie(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Genre(models.Model):
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Title(models.Model):
+    name = models.CharField(max_length=200)
+    year = models.IntegerField()
+    description = models.TextField(max_length=400)
+    genre = models.ForeignKey(
+        Genre, on_delete=models.SET_NULL,
+        blank=True, null=True,
+        related_name='genre'
+    )
+    category = models.ForeignKey(
+        Categorie, on_delete=models.SET_NULL,
+        blank=True, null=True,
+        related_name='category'
+    )
+
+    def __str__(self):
+        return self.name
+
 
 class Review(models.Model):
     title = models.ForeignKey(
