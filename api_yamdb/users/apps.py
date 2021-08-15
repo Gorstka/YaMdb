@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class UsersConfig(AppConfig):
-    name = 'api'
+    name = 'users'
+    verbose_name = 'Пользователи'
