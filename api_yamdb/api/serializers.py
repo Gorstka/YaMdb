@@ -9,18 +9,17 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categories
-        fields = '__all__'
+        fields = ('name', 'slug')
 
 
 class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genres
-        fields = '__all__'
+        fields = ('name', 'slug')
 
 
 class TitleSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Titles
         fields = '__all__'

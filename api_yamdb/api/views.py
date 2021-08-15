@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -15,46 +14,48 @@ from .serializers import (
     CategorySerializer, CustomUserSerializer,
     TokenSerializer, SignupSerializer)
 from users.models import User
-from .permissions import AdminOnly
+from .permissions import AdminOnly, IsAdminOrReadOnly
 
 
-class CategoryList(generics.ListCreateAPIView):
+class CategoryListCreate(generics.ListCreateAPIView):
     queryset = Categories.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = pagination.LimitOffsetPagination
-    permission_classes = (AdminOnly,)
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class CategoryDelete(generics.DestroyAPIView):
+class CategoryDestroy(generics.DestroyAPIView):
     queryset = Categories.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsAdminOrReadOnly,)
+    lookup_field = ('slug')
 
 
-class GenreList(generics.ListCreateAPIView):
+class GenreListCreate(generics.ListCreateAPIView):
     queryset = Genres.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
-    permission_classes = (AdminOnly,)
     search_fields = ('name',)
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class GenreDelete(generics.DestroyAPIView):
+class GenreDestroy(generics.DestroyAPIView):
     queryset = Genres.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (IsAdminOrReadOnly,)
+    lookup_field = ('slug')
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitleSerializer
-    pagination_class = pagination.LimitOffsetPagination
+    pagination_class = pagination.PageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', 'year', 'genre', 'category')
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -69,7 +70,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["GET", "PATCH"],
-        permission_classes=(IsAuthenticated,))
+        permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
         if request.method == "PATCH":
             serializer = CustomUserSerializer(

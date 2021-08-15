@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'api',
     'reviews',
     'djoser',
-    'api',
     'users',
 ]
 
