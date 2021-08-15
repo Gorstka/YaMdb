@@ -22,7 +22,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username',
-        required=False
+        required=False,
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta: 
