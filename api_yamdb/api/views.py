@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from .serializers import TitleSerializer, CommentSerializer, ReviewSerializer
 from reviews.models import Title, Comment, Review
+from reviews.pagination import ReviewsPagination
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -16,3 +17,4 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = ReviewsPagination
