@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 
 from users.models import User
-from reviews.models import Categories, Genres, Titles
+from reviews.models import Categories, Genres, Titles, GenreTitle
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -19,10 +19,30 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
+class Genre_CategoryField(serializers.SlugRelatedField):
+    def __init__(self, **kwargs):
+        self.model_serializer_class = kwargs.pop('serializer')
+        super().__init__(**kwargs)
+
+    def use_pk_only_optimization(self):
+        return False
+
+    def to_representation(self, value):
+        return self.model_serializer_class(instance=value).data
+
+
 class TitleSerializer(serializers.ModelSerializer):
+    genre = Genre_CategoryField(
+        queryset=Genres.objects.all(), serializer=GenreSerializer, many=True,
+        slug_field='slug')
+    category = Genre_CategoryField(
+        queryset=Categories.objects.all(), serializer=CategorySerializer,
+        slug_field='slug')
+
     class Meta:
         model = Titles
-        fields = '__all__'
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
