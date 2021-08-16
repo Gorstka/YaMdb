@@ -52,8 +52,8 @@ class GenreDestroy(generics.DestroyAPIView):
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitleSerializer
-    pagination_class = pagination.LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
+    pagination_class = pagination.LimitOffsetPagination
     filterset_fields = ('name', 'year', 'genre', 'category')
     permission_classes = (IsAdminOrReadOnly,)
 
