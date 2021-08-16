@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
 
-from reviews.models import Title, Comment, Review
+from reviews.models import Titles, Comment, Review
 
 
 class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Title
+        model = Titles
         fields = '__all__'
 
 
