@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 
 from users.models import User
-from reviews.models import Categories, Genres, Titles
+from reviews.models import Categories, Genres, Titles, Comment, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,6 +20,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Titles
         fields = '__all__'
@@ -67,3 +68,29 @@ class SignupSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 "Нельзя регистрировать имя пользователя 'me'")
         return value
+
+        
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        required=False,
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'author', 'pub_date')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username',
+        required=False,
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta: 
+        model = Review
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
