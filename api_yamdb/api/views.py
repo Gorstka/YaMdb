@@ -1,6 +1,7 @@
 from rest_framework import (
     permissions, viewsets, pagination, generics, filters, status)
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter, NumberFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -49,12 +50,36 @@ class GenreDestroy(generics.DestroyAPIView):
     lookup_field = ('slug')
 
 
+class ModelFilter(FilterSet):
+    genre = ModelMultipleChoiceFilter(
+        field_name='genre__slug',
+        queryset=Genres.objects.all(),
+        to_field_name='slug')
+    category = ModelMultipleChoiceFilter(
+        field_name='category__slug',
+        queryset=Categories.objects.all(),
+        to_field_name='slug')
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+    year = ModelMultipleChoiceFilter(
+        field_name='year',
+        queryset=Titles.objects.all(),
+        to_field_name='year')
+
+    class Meta:
+        model = Titles
+        fields = {
+            'genre': ['exact'],
+            'category': ['exact'],
+            'name': ['contains'],
+            'year': ['exact']}
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
+    filterset_class = ModelFilter
     pagination_class = pagination.LimitOffsetPagination
-    filterset_fields = ('name', 'year', 'genre', 'category')
     permission_classes = (IsAdminOrReadOnly,)
 
 
