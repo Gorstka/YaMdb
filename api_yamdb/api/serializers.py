@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from users.models import User
-from reviews.models import Categories, Genres, Titles, GenreTitle, Comment, Review
+from reviews.models import Categories, Genres, Titles, Comment, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -12,7 +12,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Categories
         fields = ('name', 'slug')
         slug_field = ('slug')
-
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -39,6 +38,7 @@ class TitleSerializer(serializers.ModelSerializer):
     category = Genre_CategoryField(
         queryset=Categories.objects.all(), serializer=CategorySerializer,
         slug_field='slug')
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Titles
@@ -65,7 +65,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(validators=[UnicodeUsernameValidator])
-    
+
     class Meta:
         fields = ("username",)
         model = User
@@ -113,6 +113,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
-    class Meta: 
+    class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def validate(self, value):
+        is_exist = Review.objects.filter(
+            author=self.context['request'].user,
+            title=self.context['view'].kwargs.get('title_id')).exists()
+        if is_exist and self.context['request'].method == 'POST':
+            raise serializers.ValidationError(
+                'Пользователь уже оставлял отзыв на это произведение')
+        return value

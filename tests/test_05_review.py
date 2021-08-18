@@ -59,7 +59,7 @@ class Test05ReviewAPI:
                 f'Ошибка: {e}'
             )
         from django.db.utils import IntegrityError
-        title = Title.objects.get(pk=titles[0]["id"])
+        title = Titles.objects.get(pk=titles[0]["id"])
         review = None
         try:
             review = Review.objects.create(

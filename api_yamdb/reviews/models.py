@@ -40,8 +40,11 @@ class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews')
-    score = models.FloatField()
+    score = models.IntegerField()
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+
+    class Meta:
+        unique_together = ['author', 'title']
 
 
 class Comment(models.Model):
@@ -52,7 +55,7 @@ class Comment(models.Model):
         User, on_delete=models.CASCADE, related_name='comments')
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
-    
+
 class GenreTitle(models.Model):
     genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
     title = models.ForeignKey(Titles, on_delete=models.CASCADE)
