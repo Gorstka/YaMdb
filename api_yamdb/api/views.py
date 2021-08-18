@@ -1,22 +1,19 @@
 from rest_framework import (
     permissions, viewsets, pagination, generics, filters, status)
 from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter, NumberFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.pagination import ReviewsPagination, CommentsPagination
 
-from reviews.models import (
-    Titles, Genres, Categories,
-    Comment, Review)
+from reviews.models import Titles, Genres, Categories
 from .serializers import (
     TitleSerializer, GenreSerializer,
     CategorySerializer, CustomUserSerializer,
-    TokenSerializer, SignupSerializer,
-    CommentSerializer, ReviewSerializer)
+    TokenSerializer, SignupSerializer)
 from users.models import User
 from .permissions import AdminOnly, IsAdminOrReadOnly
 
@@ -53,12 +50,36 @@ class GenreDestroy(generics.DestroyAPIView):
     lookup_field = ('slug')
 
 
+class ModelFilter(FilterSet):
+    genre = ModelMultipleChoiceFilter(
+        field_name='genre__slug',
+        queryset=Genres.objects.all(),
+        to_field_name='slug')
+    category = ModelMultipleChoiceFilter(
+        field_name='category__slug',
+        queryset=Categories.objects.all(),
+        to_field_name='slug')
+    name = CharFilter(field_name='name', lookup_expr='icontains')
+    year = ModelMultipleChoiceFilter(
+        field_name='year',
+        queryset=Titles.objects.all(),
+        to_field_name='year')
+
+    class Meta:
+        model = Titles
+        fields = {
+            'genre': ['exact'],
+            'category': ['exact'],
+            'name': ['contains'],
+            'year': ['exact']}
+
+
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitleSerializer
-    pagination_class = pagination.LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre', 'category')
+    filterset_class = ModelFilter
+    pagination_class = pagination.LimitOffsetPagination
     permission_classes = (IsAdminOrReadOnly,)
 
 
@@ -129,38 +150,3 @@ class Token(generics.CreateAPIView):
             return Response(
                 serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    pagination_class = CommentsPagination
-
-    def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
-        review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, pk=review_id)
-        comments = review.comments.all()
-        return comments
-
-    def perform_create(self, serializer):
-        title_id = self.kwargs.get("title_id")
-        review_id = self.kwargs.get('review_id')
-        review = get_object_or_404(Review, pk=review_id)
-        serializer.save(author=self.request.user, review=review)
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    pagination_class = ReviewsPagination
-
-    def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, pk=title_id)
-        reviews = title.reviews.all()
-        return reviews
-
-    def perform_create(self, serializer):
-        title_id = self.kwargs.get("title_id")
-        title = get_object_or_404(Titles, pk=title_id)
-        serializer.save(author=self.request.user, title=title)

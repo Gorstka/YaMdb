@@ -10,6 +10,8 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Categories
         fields = ('name', 'slug')
+        slug_field = ('slug')
+
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -17,15 +19,13 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genres
         fields = ('name', 'slug')
+        slug_field = ('slug')
 
 
 class Genre_CategoryField(serializers.SlugRelatedField):
     def __init__(self, **kwargs):
         self.model_serializer_class = kwargs.pop('serializer')
         super().__init__(**kwargs)
-
-    def use_pk_only_optimization(self):
-        return False
 
     def to_representation(self, value):
         return self.model_serializer_class(instance=value).data
@@ -87,29 +87,3 @@ class SignupSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 "Нельзя регистрировать имя пользователя 'me'")
         return value
-
-        
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        required=False,
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta:
-        model = Comment
-        fields = ('id', 'text', 'author', 'pub_date')
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username',
-        required=False,
-        default=serializers.CurrentUserDefault()
-    )
-
-    class Meta: 
-        model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')

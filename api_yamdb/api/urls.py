@@ -4,24 +4,12 @@ from rest_framework import routers
 from .views import UserViewSet, Signup, Token
 from .views import (
     TitleViewSet, GenreListCreate, GenreDestroy,
-    CategoryListCreate, CategoryDestroy,
-    CommentViewSet, ReviewViewSet)
+    CategoryListCreate, CategoryDestroy)
 
 router = routers.DefaultRouter()
 router.register('titles', TitleViewSet)
 router.register('users', UserViewSet, basename='users')
-router.register('comments', CommentViewSet)
-router.register('reviews', ReviewViewSet)
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews',
-    ReviewViewSet,
-    basename='reviews'
-)
-router.register(
-    r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    CommentViewSet,
-    basename='comments'
-)
+
 
 urlpatterns = [
     path("v1/", include(router.urls)),
