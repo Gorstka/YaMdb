@@ -1,7 +1,7 @@
 from rest_framework import (
     permissions, viewsets, pagination, generics, filters, status)
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter, NumberFilter
+from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from reviews.models import Titles, Genres, Categories
+from reviews.models import Title, Genres, Categories
 from .serializers import (
     TitleSerializer, GenreSerializer,
     CategorySerializer, CustomUserSerializer,
@@ -62,11 +62,11 @@ class ModelFilter(FilterSet):
     name = CharFilter(field_name='name', lookup_expr='icontains')
     year = ModelMultipleChoiceFilter(
         field_name='year',
-        queryset=Titles.objects.all(),
+        queryset=Title.objects.all(),
         to_field_name='year')
 
     class Meta:
-        model = Titles
+        model = Title
         fields = {
             'genre': ['exact'],
             'category': ['exact'],
@@ -75,7 +75,7 @@ class ModelFilter(FilterSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
+    queryset = Title.objects.all()
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter

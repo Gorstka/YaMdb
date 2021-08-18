@@ -17,7 +17,7 @@ class Genres(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField()
     rating = models.IntegerField(blank=True, null=True)
@@ -35,7 +35,7 @@ class Titles(models.Model):
 
 class GenreTitle(models.Model):
     genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
-    title = models.ForeignKey(Titles, on_delete=models.CASCADE)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.genre} {self.title}'
