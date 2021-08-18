@@ -5,4 +5,4 @@ class ReviewsPagination(PageNumberPagination):
 
 
 class CommentsPagination(PageNumberPagination):
-    page_size = 1
+    page_size = 4
