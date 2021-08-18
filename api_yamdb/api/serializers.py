@@ -3,7 +3,7 @@ from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from users.models import User
-from reviews.models import Categories, Genres, Titles
+from reviews.models import Categories, Genres, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -12,7 +12,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Categories
         fields = ('name', 'slug')
         slug_field = ('slug')
-
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -41,7 +40,7 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug')
 
     class Meta:
-        model = Titles
+        model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
