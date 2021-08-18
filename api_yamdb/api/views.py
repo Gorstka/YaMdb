@@ -143,8 +143,12 @@ class Token(generics.CreateAPIView):
             if default_token_generator.check_token(user, confirmation_code):
                 token = AccessToken.for_user(user)
                 response = {
+<<<<<<< HEAD
                     "username": request.data["username"],
                     "token": str(token)
+=======
+                            "token": str(token)
+>>>>>>> 6a23438106c608c248cb021ac8c6380bf1ff3d66
                 }
                 return Response(response, status=status.HTTP_200_OK)
             return Response(
