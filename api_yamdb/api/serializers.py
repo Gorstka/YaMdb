@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
+from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from users.models import User
 from reviews.models import Categories, Genres, Titles, GenreTitle, Comment, Review
@@ -63,6 +64,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.ModelSerializer):
 
+    username = serializers.CharField(validators=[UnicodeUsernameValidator])
+    
     class Meta:
         fields = ("username",)
         model = User
