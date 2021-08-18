@@ -1,7 +1,7 @@
 from rest_framework import (
     permissions, viewsets, pagination, generics, filters, status)
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter, NumberFilter
+from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -143,12 +143,7 @@ class Token(generics.CreateAPIView):
             if default_token_generator.check_token(user, confirmation_code):
                 token = AccessToken.for_user(user)
                 response = {
-<<<<<<< HEAD
-                    "username": request.data["username"],
-                    "token": str(token)
-=======
                             "token": str(token)
->>>>>>> 6a23438106c608c248cb021ac8c6380bf1ff3d66
                 }
                 return Response(response, status=status.HTTP_200_OK)
             return Response(
