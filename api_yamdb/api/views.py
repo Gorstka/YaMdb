@@ -65,7 +65,7 @@ class Token(CreateAPIView):
             confirmation_code = request.data["confirmation_code"]
             if default_token_generator.check_token(user, confirmation_code):
                 token = AccessToken.for_user(user)
-                response = {"username": request.data["username"],
+                response = {
                             "token": str(token)
                 }
                 return Response(response, status=status.HTTP_200_OK)
