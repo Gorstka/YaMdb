@@ -5,11 +5,12 @@ from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from reviews.pagination import ReviewsPagination, CommentsPagination
 
+from reviews.pagination import ReviewsPagination, CommentsPagination
 from reviews.models import Title, Genres, Categories, Review, Comment
 from .serializers import (
     TitleSerializer, GenreSerializer,
@@ -19,7 +20,6 @@ from users.models import User
 from .permissions import (
     AdminOnly, IsAdminOrReadOnly,
     IsAuthorOrAdminOrModerator)
-from django.db.models import Avg
 
 
 class CategoryListCreate(generics.ListCreateAPIView):
