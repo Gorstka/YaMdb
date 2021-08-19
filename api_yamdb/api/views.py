@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from reviews.models import Title, Genres, Categories
+from reviews.models import Title, Genre, Category
 from .serializers import (
     TitleSerializer, GenreSerializer,
     CategorySerializer, CustomUserSerializer,
@@ -19,7 +19,7 @@ from .permissions import AdminOnly, IsAdminOrReadOnly
 
 
 class CategoryListCreate(generics.ListCreateAPIView):
-    queryset = Categories.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
@@ -28,14 +28,14 @@ class CategoryListCreate(generics.ListCreateAPIView):
 
 
 class CategoryDestroy(generics.DestroyAPIView):
-    queryset = Categories.objects.all()
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
     lookup_field = ('slug')
 
 
 class GenreListCreate(generics.ListCreateAPIView):
-    queryset = Genres.objects.all()
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
@@ -44,7 +44,7 @@ class GenreListCreate(generics.ListCreateAPIView):
 
 
 class GenreDestroy(generics.DestroyAPIView):
-    queryset = Genres.objects.all()
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     lookup_field = ('slug')
@@ -53,11 +53,11 @@ class GenreDestroy(generics.DestroyAPIView):
 class ModelFilter(FilterSet):
     genre = ModelMultipleChoiceFilter(
         field_name='genre__slug',
-        queryset=Genres.objects.all(),
+        queryset=Genre.objects.all(),
         to_field_name='slug')
     category = ModelMultipleChoiceFilter(
         field_name='category__slug',
-        queryset=Categories.objects.all(),
+        queryset=Category.objects.all(),
         to_field_name='slug')
     name = CharFilter(field_name='name', lookup_expr='icontains')
     year = ModelMultipleChoiceFilter(
