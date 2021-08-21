@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
+import datetime
 
 from users.models import User
 from reviews.models import Category, Genre, Title, Comment, Review
@@ -10,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ('name', 'slug')
+        exclude = ('id',)
         slug_field = ('slug')
 
 
@@ -18,11 +19,11 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('name', 'slug')
+        exclude = ('id',)
         slug_field = ('slug')
 
 
-class Genre_CategoryField(serializers.SlugRelatedField):
+class GenreCategoryField(serializers.SlugRelatedField):
     def __init__(self, **kwargs):
         self.model_serializer_class = kwargs.pop('serializer')
         super().__init__(**kwargs)
@@ -32,10 +33,10 @@ class Genre_CategoryField(serializers.SlugRelatedField):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = Genre_CategoryField(
+    genre = GenreCategoryField(
         queryset=Genre.objects.all(), serializer=GenreSerializer, many=True,
         slug_field='slug')
-    category = Genre_CategoryField(
+    category = GenreCategoryField(
         queryset=Category.objects.all(), serializer=CategorySerializer,
         slug_field='slug')
     rating = serializers.IntegerField(read_only=True)
@@ -44,6 +45,12 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+
+    def validate(self, data):
+        if(self.context['request'].method == 'POST'
+                and data['year'] > datetime.datetime.now().year):
+            raise serializers.ValidationError('Выберите корректный год!')
+        return data
 
 
 class CustomUserSerializer(serializers.ModelSerializer):

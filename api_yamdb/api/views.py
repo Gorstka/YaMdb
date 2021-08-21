@@ -1,7 +1,7 @@
 from rest_framework import (
-    permissions, viewsets, pagination, generics, filters, status)
+    permissions, viewsets, pagination, generics, filters, status, mixins)
 from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter
+
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -20,62 +20,34 @@ from users.models import User
 from .permissions import (
     AdminOnly, IsAdminOrReadOnly,
     IsAuthorOrAdminOrModerator)
+from .filters import ModelFilter
 
 
-class CategoryListCreate(generics.ListCreateAPIView):
+class CreateDestroyListViewSet(
+    mixins.CreateModelMixin, mixins.DestroyModelMixin,
+    mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(CreateDestroyListViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    lookup_field = 'slug'
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     permission_classes = (IsAdminOrReadOnly,)
 
 
-class CategoryDestroy(generics.DestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    lookup_field = ('slug')
-
-
-class GenreListCreate(generics.ListCreateAPIView):
+class GenreViewSet(CreateDestroyListViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    lookup_field = 'slug'
     pagination_class = pagination.PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     permission_classes = (IsAdminOrReadOnly,)
-
-
-class GenreDestroy(generics.DestroyAPIView):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    lookup_field = ('slug')
-
-
-class ModelFilter(FilterSet):
-    genre = ModelMultipleChoiceFilter(
-        field_name='genre__slug',
-        queryset=Genre.objects.all(),
-        to_field_name='slug')
-    category = ModelMultipleChoiceFilter(
-        field_name='category__slug',
-        queryset=Category.objects.all(),
-        to_field_name='slug')
-    name = CharFilter(field_name='name', lookup_expr='icontains')
-    year = ModelMultipleChoiceFilter(
-        field_name='year',
-        queryset=Title.objects.all(),
-        to_field_name='year')
-
-    class Meta:
-        model = Title
-        fields = {
-            'genre': ['exact'],
-            'category': ['exact'],
-            'name': ['contains'],
-            'year': ['exact']}
 
 
 class TitleViewSet(viewsets.ModelViewSet):
