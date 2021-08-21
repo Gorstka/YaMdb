@@ -54,7 +54,6 @@ class GenreViewSet(CreateDestroyListViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleWriteSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter
     pagination_class = pagination.LimitOffsetPagination
@@ -88,7 +87,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.validated_data.pop('role', False)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-            
+
         serializer = self.get_serializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -99,11 +98,14 @@ class Signup(generics.CreateAPIView):
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
-        if not User.objects.filter(username=serializer.validated_data["username"],
-                                       email=serializer.validated_data["email"]).exists():
+        if not User.objects.filter(
+            username=serializer.validated_data["username"],
+            email=serializer.validated_data["email"]
+        ).exists():
             serializer.save()
-        user = get_object_or_404(User, 
-            username=serializer.validated_data["username"], email=serializer.validated_data["email"])
+        user = get_object_or_404(
+            User, username=serializer.validated_data["username"],
+            email=serializer.validated_data["email"])
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             "Hello",
@@ -121,7 +123,8 @@ class Token(generics.CreateAPIView):
         serializer = TokenSerializer(data=request.data)
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
-        user = get_object_or_404(User, username=serializer.validated_data["username"])
+        user = get_object_or_404(
+            User, username=serializer.validated_data["username"])
         confirmation_code = serializer.validated_data["confirmation_code"]
         if default_token_generator.check_token(user, confirmation_code):
             token = AccessToken.for_user(user)
@@ -129,8 +132,7 @@ class Token(generics.CreateAPIView):
                 "token": str(token)
             }
             return Response(response, status=status.HTTP_200_OK)
-        return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
