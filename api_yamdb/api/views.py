@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from reviews.pagination import ReviewsPagination, CommentsPagination
 from reviews.models import Title, Genre, Category, Review, Comment
 from .serializers import (
-    TitleSerializer, GenreSerializer,
+    TitleReadSerializer, TitleWriteSerializer, GenreSerializer,
     CategorySerializer, CustomUserSerializer,
     TokenSerializer, SignupSerializer, ReviewSerializer, CommentSerializer)
 from users.models import User
@@ -52,11 +52,16 @@ class GenreViewSet(CreateDestroyListViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    serializer_class = TitleWriteSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter
     pagination_class = pagination.LimitOffsetPagination
     permission_classes = (IsAdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleReadSerializer
+        return TitleWriteSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

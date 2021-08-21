@@ -23,23 +23,26 @@ class GenreSerializer(serializers.ModelSerializer):
         slug_field = ('slug')
 
 
-class GenreCategoryField(serializers.SlugRelatedField):
-    def __init__(self, **kwargs):
-        self.model_serializer_class = kwargs.pop('serializer')
-        super().__init__(**kwargs)
-
-    def to_representation(self, value):
-        return self.model_serializer_class(instance=value).data
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreCategoryField(
-        queryset=Genre.objects.all(), serializer=GenreSerializer, many=True,
-        slug_field='slug')
-    category = GenreCategoryField(
-        queryset=Category.objects.all(), serializer=CategorySerializer,
-        slug_field='slug')
+class TitleReadSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
     rating = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+
+
+class TitleWriteSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True)
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug'
+    )
 
     class Meta:
         model = Title
