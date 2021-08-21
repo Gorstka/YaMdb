@@ -1,9 +1,11 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+import datetime
 
 from users.models import User
 
 
-class Categories(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
@@ -11,7 +13,7 @@ class Categories(models.Model):
         return self.name
 
 
-class Genres(models.Model):
+class Genre(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
 
@@ -20,16 +22,25 @@ class Genres(models.Model):
 
 
 class Title(models.Model):
+    def year_validator(value):
+        if value > datetime.datetime.now().year:
+            raise ValidationError('Выберите корректный год!')
+
     name = models.CharField(max_length=200)
-    year = models.IntegerField()
+    year = models.PositiveSmallIntegerField(
+        validators=[year_validator])
     rating = models.IntegerField(blank=True, null=True)
     description = models.TextField(max_length=400, blank=True, null=True)
-    genre = models.ManyToManyField(Genres, through='GenreTitle')
+    genre = models.ManyToManyField(Genre, through='GenreTitle')
     category = models.ForeignKey(
-        Categories, on_delete=models.SET_NULL,
+        Category, on_delete=models.SET_NULL,
         blank=True, null=True,
-        related_name='title'
+        related_name='titles'
     )
+
+    def year_validator(value):
+        if value > datetime.datetime.now().year:
+            raise ValidationError('Выберите корректный год!')
 
     def __str__(self):
         return self.name
@@ -64,7 +75,7 @@ class Comment(models.Model):
 
 
 class GenreTitle(models.Model):
-    genre = models.ForeignKey(Genres, on_delete=models.CASCADE)
+    genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
 
     def __str__(self):

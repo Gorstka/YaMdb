@@ -4,4 +4,4 @@ djangorestframework==3.12.4
 pytest==6.2.4
 pytest-django==4.4.0
 pytest-pythonpath==0.7.3
-djoser
+djoser==2.0.1
