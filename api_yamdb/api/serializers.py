@@ -48,8 +48,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = ('__all__')
 
     def validate(self, data):
         if(self.context['request'].method == 'POST'
