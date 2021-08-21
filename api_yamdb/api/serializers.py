@@ -75,9 +75,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(validators=[UnicodeUsernameValidator])
+    confirmation_code = serializers.CharField()
 
     class Meta:
-        fields = ("username",)
+        fields = ("username", "confirmation_code")
         model = User
 
 
