@@ -38,7 +38,9 @@ class TitleSerializer(serializers.ModelSerializer):
     category = Genre_CategoryField(
         queryset=Categories.objects.all(), serializer=CategorySerializer,
         slug_field='slug')
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.FloatField(
+        source='reviews__score__avg', read_only=True
+    )
 
     class Meta:
         model = Title
@@ -116,6 +118,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+    def get_rating(self, obj):
+        return 
 
     def validate(self, value):
         is_exist = Review.objects.filter(

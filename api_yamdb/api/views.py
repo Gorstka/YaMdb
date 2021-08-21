@@ -79,7 +79,7 @@ class ModelFilter(FilterSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.all().annotate(Avg('reviews__score'))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter
@@ -190,13 +190,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
-        int_rating = Review.objects.filter(title=title).aggregate(Avg('score'))
-        title.rating = int_rating['score__avg']
-        title.save(update_fields=["rating"])
+        # int_rating = Review.objects.filter(title=title).aggregate(Avg('score'))
+        # title.rating = int_rating['score__avg']
+        # title.save(update_fields=["rating"])
 
     def perform_update(self, serializer):
         serializer.save()
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        int_rating = Review.objects.filter(title=title).aggregate(Avg('score'))
-        title.rating = int_rating['score__avg']
-        title.save(update_fields=["rating"])
+        # int_rating = Review.objects.filter(title=title).aggregate(Avg('score'))
+        # title.rating = int_rating['score__avg']
+        # title.save(update_fields=["rating"])
