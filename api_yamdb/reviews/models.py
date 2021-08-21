@@ -37,10 +37,6 @@ class Title(models.Model):
         related_name='titles'
     )
 
-    def year_validator(value):
-        if value > datetime.datetime.now().year:
-            raise ValidationError('Выберите корректный год!')
-
     def __str__(self):
         return self.name
 
