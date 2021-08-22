@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.validators import ValidationError
 
 from reviews.pagination import ReviewsPagination, CommentsPagination
-from reviews.models import Title, Genre, Category, Review, Comment
+from reviews.models import Title, Genre, Category, Review
 from .serializers import (
     TitleReadSerializer, TitleWriteSerializer, GenreSerializer,
     CategorySerializer, CustomUserSerializer,
@@ -132,7 +132,6 @@ class Token(generics.CreateAPIView):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrAdminOrModerator,)
     pagination_class = CommentsPagination
