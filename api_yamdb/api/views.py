@@ -10,7 +10,6 @@ from django.db.models import Avg
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.validators import ValidationError
 
 from reviews.pagination import ReviewsPagination, CommentsPagination
 from reviews.models import Title, Genre, Category, Review
@@ -78,8 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'PATCH':
             serializer = CustomUserSerializer(
                 request.user, partial=True, data=request.data)
-            if not serializer.is_valid():
-                raise ValidationError(serializer.errors)
+            serializer.is_valid(raise_exception=True)
             serializer.validated_data.pop('role', False)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -92,8 +90,7 @@ class Signup(generics.CreateAPIView):
 
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
-        if not serializer.is_valid():
-            raise ValidationError(serializer.errors)
+        serializer.is_valid(raise_exception=True)
         if not User.objects.filter(
             username=serializer.validated_data['username'],
             email=serializer.validated_data['email']
@@ -117,8 +114,7 @@ class Token(generics.CreateAPIView):
 
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
-        if not serializer.is_valid():
-            raise ValidationError(serializer.errors)
+        serializer.is_valid(raise_exception=True)
         user = get_object_or_404(
             User, username=serializer.validated_data['username'])
         confirmation_code = serializer.validated_data['confirmation_code']

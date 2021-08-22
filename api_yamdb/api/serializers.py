@@ -103,6 +103,16 @@ class SignupSerializer(serializers.ModelSerializer):
                 "Нельзя регистрировать имя пользователя 'me'")
         return value
 
+    # def validate(self, data):
+    #     is_exist = User.objects.filter(
+    #         username=data['username'],
+    #         email=data['email']
+    #     ).exists()
+    #     if is_exist and self.context['request'].method == 'POST':
+    #         raise serializers.ValidationError(
+    #             'Пользователь уже существует')
+    #     return data
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
