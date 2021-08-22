@@ -1,7 +1,7 @@
 from rest_framework import (
-    permissions, viewsets, pagination, generics, filters, status, mixins)
+    permissions, viewsets, pagination, generics, filters, status)
 from django_filters.rest_framework import DjangoFilterBackend
-from api_yamdb import settings
+
 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
@@ -23,13 +23,8 @@ from .permissions import (
     AdminOnly, IsAdminOrReadOnly,
     IsAuthorOrAdminOrModerator)
 from .filters import ModelFilter
-
-
-class CreateDestroyListViewSet(
-    mixins.CreateModelMixin, mixins.DestroyModelMixin,
-    mixins.ListModelMixin, viewsets.GenericViewSet
-):
-    pass
+from api_yamdb import settings
+from .mixins import CreateDestroyListViewSet
 
 
 class CategoryViewSet(CreateDestroyListViewSet):
@@ -70,17 +65,17 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-    lookup_field = "username"
+    lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
-    search_fields = ("=username",)
+    search_fields = ('=username',)
     permission_classes = (AdminOnly,)
 
     @action(
         detail=False,
-        methods=["GET", "PATCH"],
+        methods=['GET', 'PATCH'],
         permission_classes=(permissions.IsAuthenticated,))
     def me(self, request):
-        if request.method == "PATCH":
+        if request.method == 'PATCH':
             serializer = CustomUserSerializer(
                 request.user, partial=True, data=request.data)
             if not serializer.is_valid():
@@ -100,19 +95,19 @@ class Signup(generics.CreateAPIView):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
         if not User.objects.filter(
-            username=serializer.validated_data["username"],
-            email=serializer.validated_data["email"]
+            username=serializer.validated_data['username'],
+            email=serializer.validated_data['email']
         ).exists():
             serializer.save()
         user = get_object_or_404(
-            User, username=serializer.validated_data["username"],
-            email=serializer.validated_data["email"])
+            User, username=serializer.validated_data['username'],
+            email=serializer.validated_data['email'])
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
-            "Hello",
-            f"Your confirmation Code - {confirmation_code}",
+            'Hello',
+            f'Your confirmation Code - {confirmation_code}',
             settings.EMAIL_HOST_USER,
-            [serializer.validated_data["email"]],
+            [serializer.validated_data['email']],
             fail_silently=True,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -125,12 +120,12 @@ class Token(generics.CreateAPIView):
         if not serializer.is_valid():
             raise ValidationError(serializer.errors)
         user = get_object_or_404(
-            User, username=serializer.validated_data["username"])
-        confirmation_code = serializer.validated_data["confirmation_code"]
+            User, username=serializer.validated_data['username'])
+        confirmation_code = serializer.validated_data['confirmation_code']
         if default_token_generator.check_token(user, confirmation_code):
             token = AccessToken.for_user(user)
             response = {
-                "token": str(token)
+                'token': str(token)
             }
             return Response(response, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

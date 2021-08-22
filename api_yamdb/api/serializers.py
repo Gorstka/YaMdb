@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, ValidationError
 from django.contrib.auth.validators import UnicodeUsernameValidator
-import datetime
+from django.utils import timezone
 
 from users.models import User
 from reviews.models import Category, Genre, Title, Comment, Review
@@ -52,7 +52,7 @@ class TitleWriteSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if(self.context['request'].method == 'POST'
-                and data['year'] > datetime.datetime.now().year):
+                and data['year'] > timezone.now().year):
             raise serializers.ValidationError('Выберите корректный год!')
         return data
 
@@ -61,14 +61,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            "username", "email", "role", "bio", "first_name", "last_name")
+            'username', 'email', 'role', 'bio', 'first_name', 'last_name')
         model = User
-        extra_kwargs = {"email": {"required": True}}
+        extra_kwargs = {'email': {'required': True}}
         validators = [
             UniqueTogetherValidator(
                 queryset=User.objects.all(),
-                fields=("email",),
-                message="Почта уже существует",
+                fields=('email',),
+                message='Почта уже существует',
             )
         ]
 
@@ -79,26 +79,26 @@ class TokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField()
 
     class Meta:
-        fields = ("username", "confirmation_code")
+        fields = ('username', 'confirmation_code')
         model = User
 
 
 class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ("email", "username")
+        fields = ('email', 'username')
         model = User
-        extra_kwargs = {"email": {"required": True}}
+        extra_kwargs = {'email': {'required': True}}
         validators = [
             UniqueTogetherValidator(
                 queryset=User.objects.all(),
-                fields=("email",),
-                message="Почта уже существует",
+                fields=('email',),
+                message='Почта уже существует',
             )
         ]
 
     def validate_username(self, value):
-        if value == "me":
+        if value == 'me':
             raise ValidationError(
                 "Нельзя регистрировать имя пользователя 'me'")
         return value

@@ -1,4 +1,5 @@
 from django_filters import ModelMultipleChoiceFilter, FilterSet, CharFilter
+
 from reviews.models import Title, Genre, Category
 
 

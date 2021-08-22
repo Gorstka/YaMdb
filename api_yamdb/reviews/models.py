@@ -1,8 +1,7 @@
-from django.core.exceptions import ValidationError
 from django.db import models
-import datetime
 
 from users.models import User
+from .validators import year_validator
 
 
 class Category(models.Model):
@@ -22,10 +21,6 @@ class Genre(models.Model):
 
 
 class Title(models.Model):
-    def year_validator(value):
-        if value > datetime.datetime.now().year:
-            raise ValidationError('Выберите корректный год!')
-
     name = models.CharField(max_length=200)
     year = models.PositiveSmallIntegerField(
         validators=[year_validator])
