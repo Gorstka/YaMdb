@@ -91,11 +91,7 @@ class Signup(generics.CreateAPIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not User.objects.filter(
-            username=serializer.validated_data['username'],
-            email=serializer.validated_data['email']
-        ).exists():
-            serializer.save()
+        serializer.save()
         user = get_object_or_404(
             User, username=serializer.validated_data['username'],
             email=serializer.validated_data['email'])
