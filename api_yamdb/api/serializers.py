@@ -125,6 +125,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
