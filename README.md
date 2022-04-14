@@ -37,6 +37,6 @@ http://127.0.0.1:8000/redoc/
 
 ### _Автор_
 
-Горстка Сергей, github.com/Gorstka, gorstkasergei@gmail.com 
-Яков Зубец
+Горстка Сергей, github.com/Gorstka, gorstkasergei@gmail.com </br>
+Яков Зубец </br>
 Алексей Поляков
