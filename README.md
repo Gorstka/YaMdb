@@ -34,3 +34,9 @@ python manage.py runserver
 http://127.0.0.1:8000/redoc/
 ```
 5. При необходимости протестировать проект запросами при помощи Postman либо др. сервисов.
+
+### _Автор_
+
+Горстка Сергей, github.com/Gorstka, gorstkasergei@gmail.com 
+Яков Зубец
+Алексей Поляков
