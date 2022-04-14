@@ -39,7 +39,8 @@ http://127.0.0.1:8000/redoc/
 
 - Python 
 - Django
-- pytest
+- Django Rest Framework
+- JWT authentication
 - SQLlite3
 
 ### _Авторы_
